@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+<mapper namespace="cn.mldn.singup.dao.IBespeakDAO">
+	<select id="findById" parameterType="Integer" resultType="Bespeak">
+		SELECT beid,typeid,eduid,srcid,name,phone,school,edu,bedate,indate,status,benote,note,type,src
+		FROM bespeak WHERE beid=#{beid}
+	</select>
+	<select id="findAllSplitByStatus" parameterType="java.util.Map" resultType="Bespeak">
+		SELECT beid,typeid,eduid,srcid,name,phone,school,edu,bedate,indate,status,benote,note,type,src
+		FROM bespeak 
+		<where>
+			<if test="column != null and keyWord != null">
+				${column} LIKE #{keyWord} AND
+			</if>
+			<if test="status != null">
+				status = #{status} AND
+			</if>
+			1=1 
+		</where>
+		ORDER BY indate DESC  
+		LIMIT #{start},#{lineSize} ;
+	</select>
+	<select id="getAllCountByStatus" parameterType="java.util.Map" resultType="Integer">
+		SELECT COUNT(*) FROM bespeak
+		<where>
+			<if test="column != null and keyWord != null">
+				${column} LIKE #{keyWord} AND
+			</if>
+			<if test="status != null">
+				status = #{status} AND
+			</if>
+			1=1 
+		</where>
+	</select>  
+	<insert id="doCreate" parameterType="Bespeak">
+		INSERT INTO bespeak(typeid,eduid,srcid,name,phone,school,edu,bedate,indate,status,benote,note,type,src)
+		VALUES(#{typeid},#{eduid},#{srcid},#{name},#{phone},#{school},#{edu},#{bedate},#{indate},#{status},#{benote},#{note},#{type},#{src}) ;
+	</insert>
+	<update id="doUpdateNote">
+	UPDATE bespeak SET note=#{newNote} WHERE beid=#{beid}
+	</update>
+	<update id="doUpdateByStatus">
+	UPDATE bespeak SET status=#{status} WHERE beid=#{beid} AND status !=2
+	</update>
+	<select id="getStatusCount" resultType="BespeakCount">
+	SELECT  status,COUNT(*) count FROM bespeak
+	GROUP BY status;
+	</select>
+</mapper>  

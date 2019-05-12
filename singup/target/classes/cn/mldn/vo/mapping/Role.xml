@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+<mapper namespace="cn.mldn.singup.dao.IRoleDAO">
+	<select id="findAll" resultType="Role">
+		SELECT rid,title,flag FROM role ;
+	</select>
+	<select id="findAllRoleFlag" parameterType="String" resultType="String">
+		SELECT flag FROM role
+		WHERE rid IN (
+			SELECT rid FROM member_role WHERE mid=#{mid}) ;
+	</select>
+</mapper>  

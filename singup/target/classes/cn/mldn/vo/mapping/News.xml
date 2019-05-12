@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+<mapper namespace="cn.mldn.singup.dao.INewsDAO">
+
+	<update id="doRemove" parameterType="Integer">
+		UPDATE news SET flag=2 
+		<where>
+			nid IN 
+			<foreach collection="array" open="(" close=")" separator="," item="ele">
+				#{ele}
+			</foreach>
+		</where>
+	</update>
+
+	<select id="findById" parameterType="Integer" resultType="News">
+		SELECT nid,dtid,mid,title,abs,content,photo,pubdate,flag   
+		FROM news WHERE nid=#{nid}
+	</select>
+	<insert id="doUpdate" parameterType="News">
+		UPDATE news SET dtid=#{dtid},mid=#{mid},title=#{title},abs=#{abs},content=#{content},photo=#{photo},flag=#{flag}
+		WHERE nid=#{nid}
+	</insert>
+
+	<select id="findAllSplitByFlag" parameterType="java.util.Map" resultType="News">
+		SELECT nid,dtid,mid,title,abs,content,photo,pubdate,flag
+		FROM news 
+		<where>
+			<if test="column != null and keyWord != null">
+				${column} LIKE #{keyWord} AND
+			</if>
+			flag = #{flag}
+		</where>
+		ORDER BY pubdate DESC  
+		LIMIT #{start},#{lineSize} ;
+	</select>
+	<select id="getAllCountByFlag" parameterType="java.util.Map" resultType="Integer">
+		SELECT COUNT(*) FROM news
+		<where>
+			<if test="column != null and keyWord != null">
+				${column} LIKE #{keyWord} AND
+			</if>
+			flag = #{flag}
+		</where>
+	</select>  
+
+
+	<select id="findAllSplit" parameterType="java.util.Map" resultType="News">
+		SELECT nid,dtid,mid,title,abs,content,photo,pubdate,flag
+		FROM news 
+		<where>
+			<if test="column != null and keyWord != null">
+				${column} LIKE #{keyWord} AND
+			</if>
+			flag &lt; 2
+		</where>
+		ORDER BY pubdate DESC  
+		LIMIT #{start},#{lineSize} ;
+	</select>
+	<select id="getAllCount" parameterType="java.util.Map" resultType="Integer">
+		SELECT COUNT(*) FROM news
+		<where>
+			<if test="column != null and keyWord != null">
+				${column} LIKE #{keyWord} AND
+			</if>
+			flag &lt; 2
+		</where>
+	</select> 
+	<select id="findByTitle" parameterType="String" resultType="News">
+		SELECT nid,dtid,mid,title,abs,content,photo,pubdate,flag   
+		FROM news WHERE title=#{title}
+	</select>
+	<insert id="doCreate" parameterType="News">
+		INSERT INTO news (dtid,mid,title,abs,content,photo,pubdate,flag)
+		VALUES (#{dtid},#{mid},#{title},#{abs},#{content},#{photo},#{pubdate},#{flag}) ; 
+	</insert>
+</mapper>  

@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+	id="WebApp_ID" version="3.1">
+	<display-name>singup</display-name>
+	<!-- 在WEB容器里面进行Spring容器的加载 -->
+	<listener>
+		<listener-class>
+			org.springframework.web.context.ContextLoaderListener
+		</listener-class>
+	</listener> 
+	<!-- 此配置描述的是在项目开发过程之中，Spring容器所需要使用到的配置文件 -->
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>
+			classpath:applicationContext.xml ,
+			classpath:applicationShiro.xml 
+		</param-value>
+	</context-param> 
+	<!-- 此为Spring MVC配置所需要的程序文件，所有的请求都提交给Spring的Servlet程序 -->
+	<servlet>
+		<servlet-name>springmvc</servlet-name>
+		<!-- 此为Spring MVC自己提供的servlet程序，一定要写上，因为其可以处理用户请求 -->
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<init-param>
+			<param-name>contextConfigLocation</param-name>
+			<!-- 配置Spring MVC所需要的配置文件，可以与Spring容器写在一起 -->
+			<param-value>classpath:applicationMVC.xml</param-value>
+		</init-param>
+	</servlet>
+	<!-- SpringMVC中所有路径的请求映射，使用的是“*.action” -->
+	<servlet-mapping>
+		<servlet-name>springmvc</servlet-name>
+		<url-pattern>*.action</url-pattern>
+	</servlet-mapping>
+	<!-- Spring中提供的编码过滤器，使用的编码都是UTF-8 -->
+	<filter>
+		<filter-name>encoding</filter-name>
+		<filter-class>
+			org.springframework.web.filter.CharacterEncodingFilter
+		</filter-class>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>UTF-8</param-value> 
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>encoding</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	
+	<!-- 进行shiro的过滤器的配置 -->
+	<filter>
+		<filter-name>shiroFilter</filter-name>
+		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+		<!-- 该参数表示shiro的生命周期将交由Spring容器进行管理（默认情况下，取值为false） -->
+		<!-- 如果将其内容设置为true，则表示由Servlet容器进行管理 -->
+		<init-param>
+			<param-name>targetFilterLifecycle</param-name>
+			<param-value>true</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>shiroFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+		<dispatcher>REQUEST</dispatcher>
+		<dispatcher>FORWARD</dispatcher>
+		<dispatcher>INCLUDE</dispatcher>
+		<dispatcher>ERROR</dispatcher>
+	</filter-mapping>
+<error-page>
+<exception-type>
+org.apache.shiro.authz.UnauthenticatedException
+</exception-type>
+<location>/loginUrl.action</location>
+</error-page>
+<error-page>
+<exception-type>
+org.apache.shiro.authz.UnauthorizedException
+</exception-type>
+<location>/unauthUrl.action</location>
+</error-page> 
+
+	<servlet>			<!-- 验证码功能 -->
+		<servlet-name>KaptchaServlet</servlet-name>
+		<servlet-class>com.google.code.kaptcha.servlet.KaptchaServlet</servlet-class>
+		<init-param>	<!-- 定义是否存在有边框 -->
+			<param-name>kaptcha.border</param-name>
+			<param-value>no</param-value>
+		</init-param>
+		<init-param>	<!-- 定义边框颜色 -->
+			<param-name>kaptcha.border.color</param-name>
+			<param-value>105,179,90</param-value>
+		</init-param>
+		<init-param>	<!-- 设置字体颜色 -->
+			<param-name>kaptcha.textproducer.font.color</param-name>
+			<param-value>red</param-value>
+		</init-param>
+		<init-param>	<!-- 设置生成图片宽度 -->
+			<param-name>kaptcha.image.width</param-name>
+			<param-value>130</param-value>
+		</init-param>
+		<init-param>	<!-- 设置生成图片高度 -->
+			<param-name>kaptcha.image.height</param-name>
+			<param-value>38</param-value>
+		</init-param>
+		<init-param>	<!-- 设置验证码显示文字尺寸 -->
+			<param-name>kaptcha.textproducer.font.size</param-name>
+			<param-value>30</param-value>
+		</init-param>
+		<init-param>	<!-- 设置验证码保存到session中的属性名称 -->
+			<param-name>kaptcha.session.key</param-name>
+			<param-value>rand</param-value>
+		</init-param>
+		<init-param>	<!-- 设置字符间距 -->
+			<param-name>kaptcha.textproducer.char.space</param-name>
+			<param-value>2</param-value>
+		</init-param>
+		<init-param>	<!-- 设置生成的验证码长度 -->
+			<param-name>kaptcha.textproducer.char.length</param-name>
+			<param-value>4</param-value>
+		</init-param>
+		<init-param>	<!-- 设置使用的字体 -->
+			<param-name>kaptcha.textproducer.font.names</param-name>
+			<param-value>宋体,楷体,微软雅黑</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>KaptchaServlet</servlet-name>
+		<url-pattern>/captcha.jpg</url-pattern>
+	</servlet-mapping>
+	<welcome-file-list>
+		<welcome-file>index.html</welcome-file>
+		<welcome-file>index.htm</welcome-file>
+		<welcome-file>index.jsp</welcome-file>
+		<welcome-file>default.html</welcome-file>
+		<welcome-file>default.htm</welcome-file>
+		<welcome-file>default.jsp</welcome-file>
+	</welcome-file-list>
+</web-app>

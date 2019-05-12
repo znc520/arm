@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+<mapper namespace="cn.mldn.singup.dao.IMemberDAO">
+	<select id="findAllRoleByMember" parameterType="String" resultType="String">
+		SELECT rid FROM member_role WHERE mid=#{mid} ;
+	</select>
+	
+	<update id="doUpdate" parameterType="Member">
+		UPDATE member SET name=#{name},
+		<if test="password != null">
+			password = #{password} ,
+		</if>
+		locked=#{locked} WHERE mid=#{mid} AND sflag=0
+	</update>
+
+	<delete id="doRemoveMemberAndRole" parameterType="String">
+		DELETE FROM member_role WHERE mid=#{mid}
+	</delete>
+	
+	
+	<insert id="doCreateMemberAndRole" parameterType="java.util.Map">
+		INSERT INTO member_role (mid,rid) VALUES (#{mid},#{rid}) ;
+	</insert>
+
+	<insert id="doCreate" parameterType="Member">
+		INSERT INTO member (mid,password,name,sflag,regdate,locked)
+		VALUES (#{mid},#{password},#{name},#{sflag},#{regdate},#{locked}) ;
+	</insert>
+	<!-- 实现用户的锁定的状态处理 -->
+	<update id="doUpdateLocked" parameterType="java.util.Map">
+		UPDATE member SET locked=#{locked} WHERE mid=#{mid} AND sflag=0 ;
+	</update>
+	<!-- 实现用户密码的变更处理 -->
+	<update id="doUpdatePasswordByAdmin" parameterType="java.util.Map">
+		UPDATE member SET password=#{password} WHERE mid=#{mid} AND sflag=0 ;
+	</update> 
+	<!-- 定义查询全部的DAO实现操作代码 -->
+	<select id="findAll" resultType="Member">
+		SELECT mid,password,name,sflag,regdate,locked FROM member ;
+	</select>
+	<!-- 根据id进行查询，在shiro里面会首先取得指定id的完整数据 -->
+	<select id="findById" parameterType="String" resultType="Member">
+		SELECT mid,password,name,sflag,regdate,locked 
+		FROM member WHERE mid=#{mid} ; 
+	</select>
+	<!-- 修改用户的密码，需要传入的是一个Map集合 -->
+	<update id="doUpdatePassword" parameterType="java.util.Map">
+		UPDATE member SET password=#{newPassword} WHERE mid=#{mid} ;
+	</update>
+</mapper>  
